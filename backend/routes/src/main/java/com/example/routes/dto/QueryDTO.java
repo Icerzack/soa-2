@@ -14,13 +14,19 @@ public class QueryDTO {
     private List<Long> id = null;
     private List<String> name = null;
     private List<String> creationDate = null;
-    private List<Integer> locationId = null;
-    private List<Integer> coordinatesX = null;
-    private List<Float> coordinatesY = null;
-    private List<String> locationName = null;
+    private List<Integer> locationFromId = null;
+    private List<Integer> locationFromCoordinatesX = null;
+    private List<Float> locationFromCoordinatesY = null;
+    private List<String> locationFromName = null;
+    private List<Integer> locationToId = null;
+    private List<Integer> locationToCoordinatesX = null;
+    private List<Float> locationToCoordinatesY = null;
+    private List<String> locationToName = null;
     private List<Float> distance = null;
     private Sort.Direction sortDirection;
     private String sort;
+    private List<String> filter;
     private Integer page;
     private Integer pagesCount;
+
 }

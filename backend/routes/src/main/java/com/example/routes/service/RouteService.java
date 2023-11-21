@@ -9,21 +9,20 @@ import com.example.routes.exception.EntityNotFoundException;
 import com.example.routes.repository.LocationRepository;
 import com.example.routes.repository.RouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.jta.JtaTransactionManager;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.transaction.UserTransaction;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 @Service
 public class RouteService {
+    private static final double EPSILON = 0.001;
     @Autowired
     private RouteRepository routeRepository;
     @Autowired
@@ -35,30 +34,145 @@ public class RouteService {
         this.routeConverter = routeConverter;
     }
 
-//    @Transactional(readOnly = true)
-//    public List<RouteDTO> getAllRoutes(@Valid QueryDTO dto) {
-//        FilterService.isValidRequestParams(dto);
-////        PageRequest request = PageService.getPageRequest(dto.getLimit(), dto.getOffset(), dto.getSortAsc(), dto.getSort());
-//
-//        List<RouteEntity> allRoutes = routeRepository.findAllRoutesEntity();
-//        List<RouteDTO> allRoutesResponse = new ArrayList<>();
-//        for (RouteEntity routeEntity: allRoutes) {
-//            allRoutesResponse.add(routeConverter.convertToDTO(routeEntity));
-//        }
-//        return allRoutesResponse;
-//    }
+    public List<RouteEntity> filterRoutes(QueryDTO query, List<RouteEntity> routeEntities) {
+        List<RouteDTO> routeDTOs = routeEntities.stream()
+                .map(routeConverter::convertToDTO)
+                .collect(Collectors.toList());
+
+        return routeDTOs.stream()
+                .filter(route -> checkConditions(route, query))
+                .map(routeConverter::convertToEntity)
+                .collect(Collectors.toList());
+    }
+
+    private boolean checkConditions(RouteDTO route, QueryDTO query) {
+        if (query.getFilter() != null) {
+            String regex = "^(id|name|creationDate|locationFrom\\.id|locationFrom\\.coordinates\\.x|locationFrom\\.coordinates\\.y|locationFrom\\.name|locationTo\\.id|locationTo\\.coordinates\\.x|locationTo\\.coordinates\\.y|locationTo\\.name|distance)(=|!=|>|<|>=|<=)([0-9]+)$";
+            Pattern pattern = Pattern.compile(regex);
+
+            return query.getFilter().stream()
+                    .map(pattern::matcher)
+                    .filter(Matcher::matches)
+                    .allMatch(matcher -> {
+                        String field = matcher.group(1);
+                        String operator = matcher.group(2);
+                        String value = matcher.group(3);
+
+                        switch (operator) {
+                            case "=":
+                                return checkEqual(route, field, value);
+                            case "!=":
+                                return checkNotEqual(route, field, value);
+                            case ">":
+                                return checkGreaterThan(route, field, value);
+                            case "<":
+                                return checkLessThan(route, field, value);
+                            case ">=":
+                                return checkGreaterThanOrEqual(route, field, value);
+                            case "<=":
+                                return checkLessThanOrEqual(route, field, value);
+                            default:
+                                return true;
+                        }
+                    });
+        }
+
+        return true;
+    }
+
+    private boolean checkEqual(RouteDTO route, String field, String value) {
+        switch (field) {
+            case "id":
+                return route.getId().equals(Long.valueOf(value));
+            case "name":
+                return route.getName().equals(value);
+            case "creationDate":
+                return route.getCreationDate().equals(value);
+            case "locationFrom.id":
+                return route.getFrom().getId().equals(Long.valueOf(value));
+            case "locationFrom.coordinates.x":
+                return Math.abs(route.getFrom().getCoordinates().getX() - Float.parseFloat(value)) < EPSILON;
+            case "locationFrom.coordinates.y":
+                return Math.abs(route.getFrom().getCoordinates().getY() - Float.parseFloat(value)) < EPSILON;
+            case "locationFrom.name":
+                return route.getFrom().getName().equals(value);
+            case "locationTo.id":
+                return route.getTo().getId().equals(Long.valueOf(value));
+            case "locationTo.coordinates.x":
+                return Math.abs(route.getTo().getCoordinates().getX() - Float.parseFloat(value)) < EPSILON;
+            case "locationTo.coordinates.y":
+                return Math.abs(route.getTo().getCoordinates().getY() - Float.parseFloat(value)) < EPSILON;
+            case "locationTo.name":
+                return route.getTo().getName().equals(value);
+            case "distance":
+                return Math.abs(route.getDistance() - Float.parseFloat(value)) < EPSILON;
+            default:
+                return false;
+        }
+    }
+
+    private boolean checkNotEqual(RouteDTO route, String field, String value) {
+        return !checkEqual(route, field, value);
+    }
+
+    private boolean checkGreaterThan(RouteDTO route, String field, String value) {
+        switch (field) {
+            case "id":
+                return compareGreaterThan(route.getId(), Long.valueOf(value));
+            case "name":
+                return compareGreaterThan(route.getName(), value);
+            case "creationDate":
+                return compareGreaterThan(route.getCreationDate(), value);
+            case "locationFrom.id":
+                return compareGreaterThan(route.getFrom().getId(), Long.valueOf(value));
+            case "locationFrom.coordinates.x":
+                return compareGreaterThan(route.getFrom().getCoordinates().getX(), Integer.parseInt(value));
+            case "locationFrom.coordinates.y":
+                return compareGreaterThan(route.getFrom().getCoordinates().getY(), Float.parseFloat(value));
+            case "locationFrom.name":
+                return compareGreaterThan(route.getFrom().getName(), value);
+            case "locationTo.id":
+                return compareGreaterThan(route.getTo().getId(), Long.valueOf(value));
+            case "locationTo.coordinates.x":
+                return compareGreaterThan(route.getTo().getCoordinates().getX(), Integer.parseInt(value));
+            case "locationTo.coordinates.y":
+                return compareGreaterThan(route.getTo().getCoordinates().getY(), Float.parseFloat(value));
+            case "locationTo.name":
+                return compareGreaterThan(route.getTo().getName(), value);
+            case "distance":
+                return compareGreaterThan(route.getDistance(), Float.parseFloat(value));
+            default:
+                return false;
+        }
+    }
+
+    private <T extends Comparable<T>> boolean compareGreaterThan(T fieldValue, T compareValue) {
+        return fieldValue.compareTo(compareValue) > 0;
+    }
+
+    private boolean checkLessThan(RouteDTO route, String field, String value) {
+        return !(checkGreaterThan(route, field, value) || checkEqual(route, field, value));
+    }
+
+    private boolean checkGreaterThanOrEqual(RouteDTO route, String field, String value) {
+        return (checkGreaterThan(route, field, value) || checkEqual(route, field, value));
+    }
+
+    private boolean checkLessThanOrEqual(RouteDTO route, String field, String value) {
+        return checkLessThan(route, field, value) || checkEqual(route, field, value);
+    }
 
     @Transactional(readOnly = true)
     public List<RouteDTO> getAllRoutes(@Valid QueryDTO dto) {
         FilterService.isValidRequestParams(dto);
-
         List<RouteEntity> allRoutes = routeRepository.findAllRoutesEntity();
+        List<RouteEntity> allFilteredRoutes = filterRoutes(dto, allRoutes);
 
         Sort.Direction sortDirection = dto.getSortDirection() != null ? dto.getSortDirection() : Sort.Direction.ASC;
 
         String sortField = dto.getSort() != null && !dto.getSort().isEmpty() ? dto.getSort() : "id";
 
-        List<RouteEntity> sortedRoutes = SortService.sortElements(allRoutes, sortField, sortDirection);
+        List<RouteEntity> sortedRoutes = SortService.sortElements(allFilteredRoutes, sortField, sortDirection);
 
         List<RouteDTO> allRoutesResponse = new ArrayList<>();
         for (RouteEntity routeEntity : sortedRoutes) {

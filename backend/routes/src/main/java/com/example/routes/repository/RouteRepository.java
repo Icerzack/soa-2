@@ -1,5 +1,6 @@
 package com.example.routes.repository;
 
+import com.example.routes.dto.QueryDTO;
 import com.example.routes.entity.RouteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -35,5 +36,6 @@ public interface RouteRepository extends JpaRepository<RouteEntity, Long> {
     @Transactional
     @Query("DELETE FROM RouteEntity r WHERE r.distance = :distance")
     void deleteRoutesByDistance(@Param("distance") float distance);
+
 }
 

@@ -18,25 +18,37 @@ public class FilterService {
             dto.getId().forEach(id -> checkNumberIsNatural("id", id));
         }
         if (dto.getName() != null) {
-            dto.getName().forEach(name -> validateName(name));
+            dto.getName().forEach(FilterService::validateName);
         }
         if (dto.getCreationDate() != null) {
-            dto.getCreationDate().forEach(creationDate -> validateCreationDate(creationDate));
+            dto.getCreationDate().forEach(FilterService::validateCreationDate);
         }
-        if (dto.getLocationId() != null) {
-            dto.getLocationId().forEach(locationId -> checkNumberIsNatural("location_id", locationId));
+        if (dto.getLocationFromId() != null) {
+            dto.getLocationFromId().forEach(locationId -> checkNumberIsNatural("location_id", locationId));
         }
-        if (dto.getCoordinatesX() != null) {
-            dto.getCoordinatesX().forEach(x -> validateCoordinateX(x));
+        if (dto.getLocationToId() != null) {
+            dto.getLocationToId().forEach(locationId -> checkNumberIsNatural("location_id", locationId));
         }
-        if (dto.getCoordinatesY() != null) {
-            dto.getCoordinatesY().forEach(y -> validateCoordinateY(y));
+        if (dto.getLocationFromCoordinatesX() != null) {
+            dto.getLocationFromCoordinatesX().forEach(FilterService::validateCoordinateX);
         }
-        if (dto.getLocationName() != null) {
-            dto.getLocationName().forEach(locationName -> validateName(locationName));
+        if (dto.getLocationToCoordinatesX() != null) {
+            dto.getLocationToCoordinatesX().forEach(FilterService::validateCoordinateX);
+        }
+        if (dto.getLocationFromCoordinatesY() != null) {
+            dto.getLocationFromCoordinatesY().forEach(FilterService::validateCoordinateY);
+        }
+        if (dto.getLocationToCoordinatesY() != null) {
+            dto.getLocationToCoordinatesY().forEach(FilterService::validateCoordinateY);
+        }
+        if (dto.getLocationFromName() != null) {
+            dto.getLocationFromName().forEach(FilterService::validateName);
+        }
+        if (dto.getLocationToName() != null) {
+            dto.getLocationToName().forEach(FilterService::validateName);
         }
         if (dto.getDistance() != null) {
-            dto.getDistance().forEach(distance -> validateDistance(distance));
+            dto.getDistance().forEach(FilterService::validateDistance);
         }
         if (dto.getPage() != null) {
             checkNumberIsNatural("page", dto.getPage());
@@ -94,4 +106,51 @@ public class FilterService {
 
     public static void validateDistance(Float distance) {
     }
+
+    private boolean evaluateFilter(Comparable<?> fieldValue, String filter) {
+        if (filter.length() < 2) {
+            throw new IllegalArgumentException("Invalid filter: " + filter);
+        }
+
+        String operator = filter.substring(0, 1);
+        String valueStr = filter.substring(1);
+
+        try {
+            Comparable<?> filterValue = parseValue(fieldValue, valueStr);
+            if (fieldValue.getClass().isAssignableFrom(filterValue.getClass())) {
+                int comparisonResult = ((Comparable<Object>) fieldValue).compareTo(filterValue);
+
+                switch (operator) {
+                    case "=":
+                        return comparisonResult == 0;
+                    case "<":
+                        return comparisonResult < 0;
+                    case ">":
+                        return comparisonResult > 0;
+                    default:
+                        throw new IllegalArgumentException("Invalid operator in filter: " + operator);
+                }
+            } else {
+                throw new IllegalArgumentException("Incompatible types in filter: " + fieldValue.getClass().getSimpleName() + " and " + filterValue.getClass().getSimpleName());
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid value in filter: " + valueStr);
+        }
+    }
+
+    private Comparable<?> parseValue(Comparable<?> fieldValue, String valueStr) {
+        // Parse the value based on the type of fieldValue
+        if (fieldValue instanceof Long) {
+            return Long.parseLong(valueStr);
+        } else if (fieldValue instanceof Integer) {
+            return Integer.parseInt(valueStr);
+        } else if (fieldValue instanceof Float) {
+            return Float.parseFloat(valueStr);
+        } else if (fieldValue instanceof String) {
+            return valueStr;
+        } else {
+            throw new IllegalArgumentException("Unsupported field type: " + fieldValue.getClass().getSimpleName());
+        }
+    }
+
 }
