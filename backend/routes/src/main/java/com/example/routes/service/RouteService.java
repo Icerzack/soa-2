@@ -11,6 +11,7 @@ import com.example.routes.repository.RouteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,8 @@ public class RouteService {
     private LocationRepository locationRepository;
     @Autowired
     private final RouteConverter routeConverter;
+    @Autowired
+    private PageService pageService;
 
     public RouteService(RouteConverter routeConverter) {
         this.routeConverter = routeConverter;
@@ -165,10 +168,15 @@ public class RouteService {
         return checkLessThan(route, field, value) || checkEqual(route, field, value);
     }
 
+    public List<RouteEntity> getPaginatedRoutes(Integer page, Integer elementsCount) {
+        Pageable pageable = pageService.createPageRequest(page, elementsCount);
+        return routeRepository.findByPageAndElementsCount(pageable);
+    }
+
     @Transactional(readOnly = true)
     public List<RouteDTO> getAllRoutes(@Valid QueryDTO dto) {
         FilterService.isValidRequestParams(dto);
-        List<RouteEntity> allRoutes = routeRepository.findAllRoutesEntity();
+        List<RouteEntity> allRoutes = getPaginatedRoutes(dto.getPage(), dto.getElementsCount());
         List<RouteEntity> allFilteredRoutes = filterRoutes(dto, allRoutes);
 
         Sort.Direction sortDirection = dto.getSortDirection() != null ? dto.getSortDirection() : Sort.Direction.ASC;

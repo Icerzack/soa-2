@@ -2,6 +2,7 @@ package com.example.routes.repository;
 
 import com.example.routes.dto.QueryDTO;
 import com.example.routes.entity.RouteEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,5 +38,9 @@ public interface RouteRepository extends JpaRepository<RouteEntity, Long> {
     @Query("DELETE FROM RouteEntity r WHERE r.distance = :distance")
     void deleteRoutesByDistance(@Param("distance") float distance);
 
+    @Query("SELECT r FROM RouteEntity r ORDER BY r.id")
+    List<RouteEntity> findByPageAndElementsCount(
+            @Param("pageable") Pageable pageable
+    );
 }
 

@@ -53,8 +53,8 @@ public class FilterService {
         if (dto.getPage() != null) {
             checkNumberIsNatural("page", dto.getPage());
         }
-        if (dto.getPagesCount() != null) {
-            checkNumberIsNatural("pagesCount", dto.getPagesCount());
+        if (dto.getElementsCount() != null) {
+            checkNumberIsNatural("elementsCount", dto.getElementsCount());
         }
         if (dto.getSort() != null && !dto.getSort().isEmpty()) {
             try {

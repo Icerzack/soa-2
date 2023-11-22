@@ -27,6 +27,6 @@ public class QueryDTO {
     private String sort;
     private List<String> filter;
     private Integer page;
-    private Integer pagesCount;
+    private Integer elementsCount;
 
 }
