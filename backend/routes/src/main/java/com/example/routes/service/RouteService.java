@@ -8,6 +8,8 @@ import com.example.routes.entity.RouteEntity;
 import com.example.routes.exception.EntityNotFoundException;
 import com.example.routes.repository.LocationRepository;
 import com.example.routes.repository.RouteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class RouteService {
     private static final double EPSILON = 0.001;
+    private static final Logger logger = LoggerFactory.getLogger(RouteService.class);
     @Autowired
     private RouteRepository routeRepository;
     @Autowired
@@ -47,7 +50,7 @@ public class RouteService {
 
     private boolean checkConditions(RouteDTO route, QueryDTO query) {
         if (query.getFilter() != null) {
-            String regex = "^(id|name|creationDate|locationFrom\\.id|locationFrom\\.coordinates\\.x|locationFrom\\.coordinates\\.y|locationFrom\\.name|locationTo\\.id|locationTo\\.coordinates\\.x|locationTo\\.coordinates\\.y|locationTo\\.name|distance)(=|!=|>|<|>=|<=)([0-9]+)$";
+            String regex = "^(id|name|creationDate|locationFromId|locationFromCoordinatesX|locationFromCoordinatesY|locationFromName|locationToId|locationToCoordinatesX|locationToCoordinatesY|locationToName|distance)(=|!=|>|<|>=|<=)([0-9a-zA-Zа-яА-Я\\s?!,.'Ёё]+)$";
             Pattern pattern = Pattern.compile(regex);
 
             return query.getFilter().stream()
@@ -88,21 +91,21 @@ public class RouteService {
                 return route.getName().equals(value);
             case "creationDate":
                 return route.getCreationDate().equals(value);
-            case "locationFrom.id":
+            case "locationFromId":
                 return route.getFrom().getId().equals(Long.valueOf(value));
-            case "locationFrom.coordinates.x":
+            case "locationFromCoordinatesX":
                 return Math.abs(route.getFrom().getCoordinates().getX() - Float.parseFloat(value)) < EPSILON;
-            case "locationFrom.coordinates.y":
+            case "locationFromCoordinatesY":
                 return Math.abs(route.getFrom().getCoordinates().getY() - Float.parseFloat(value)) < EPSILON;
-            case "locationFrom.name":
+            case "locationFromName":
                 return route.getFrom().getName().equals(value);
-            case "locationTo.id":
+            case "locationToId":
                 return route.getTo().getId().equals(Long.valueOf(value));
-            case "locationTo.coordinates.x":
+            case "locationToCoordinatesX":
                 return Math.abs(route.getTo().getCoordinates().getX() - Float.parseFloat(value)) < EPSILON;
-            case "locationTo.coordinates.y":
+            case "locationToCoordinatesY":
                 return Math.abs(route.getTo().getCoordinates().getY() - Float.parseFloat(value)) < EPSILON;
-            case "locationTo.name":
+            case "locationToName":
                 return route.getTo().getName().equals(value);
             case "distance":
                 return Math.abs(route.getDistance() - Float.parseFloat(value)) < EPSILON;
@@ -123,21 +126,21 @@ public class RouteService {
                 return compareGreaterThan(route.getName(), value);
             case "creationDate":
                 return compareGreaterThan(route.getCreationDate(), value);
-            case "locationFrom.id":
+            case "locationFromId":
                 return compareGreaterThan(route.getFrom().getId(), Long.valueOf(value));
-            case "locationFrom.coordinates.x":
+            case "locationFromCoordinatesX":
                 return compareGreaterThan(route.getFrom().getCoordinates().getX(), Integer.parseInt(value));
-            case "locationFrom.coordinates.y":
+            case "locationFromCoordinatesY":
                 return compareGreaterThan(route.getFrom().getCoordinates().getY(), Float.parseFloat(value));
-            case "locationFrom.name":
+            case "locationFromName":
                 return compareGreaterThan(route.getFrom().getName(), value);
-            case "locationTo.id":
+            case "locationToId":
                 return compareGreaterThan(route.getTo().getId(), Long.valueOf(value));
-            case "locationTo.coordinates.x":
+            case "locationToCoordinatesX":
                 return compareGreaterThan(route.getTo().getCoordinates().getX(), Integer.parseInt(value));
-            case "locationTo.coordinates.y":
+            case "locationToCoordinatesY":
                 return compareGreaterThan(route.getTo().getCoordinates().getY(), Float.parseFloat(value));
-            case "locationTo.name":
+            case "locationToName":
                 return compareGreaterThan(route.getTo().getName(), value);
             case "distance":
                 return compareGreaterThan(route.getDistance(), Float.parseFloat(value));
@@ -241,9 +244,7 @@ public class RouteService {
     @Transactional
     public void deleteRouteById(Long id) {
         Optional<RouteEntity> entity = routeRepository.findRouteEntityById(id);
-        if (entity.isPresent()) {
-            routeRepository.delete(entity.get());
-        }
+        entity.ifPresent(routeEntity -> routeRepository.delete(routeEntity));
     }
 
     @Transactional
