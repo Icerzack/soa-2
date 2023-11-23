@@ -15,6 +15,7 @@ import java.time.Instant;
 @Data
 @Accessors(chain = true)
 public class RouteDTO {
+    @JsonIgnore
     private Long id;
     @NotNull
     @JsonIgnore
