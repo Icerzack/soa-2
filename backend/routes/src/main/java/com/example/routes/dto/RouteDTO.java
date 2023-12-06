@@ -1,8 +1,7 @@
 package com.example.routes.dto;
 
-import com.example.routes.entity.RouteEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -10,15 +9,13 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
 
 @Data
 @Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RouteDTO {
-    @JsonIgnore
     private Long id;
     @NotNull
-    @JsonIgnore
     private String creationDate;
     @NotNull
     @NotBlank(message = "The name should not be empty")
