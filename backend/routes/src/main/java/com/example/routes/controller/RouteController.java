@@ -2,6 +2,7 @@ package com.example.routes.controller;
 
 import com.example.routes.dto.QueryDTO;
 import com.example.routes.dto.RouteDTO;
+import com.example.routes.dto.RoutesWithPagingDTO;
 import com.example.routes.service.RouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @Api(tags = "Route", description = "Эндпоинты для взаимодействия с route")
@@ -21,7 +21,7 @@ public class RouteController {
 
     @GetMapping("/api/v1/routes")
     @ApiOperation(value = "Получить список из элементов Route")
-    public ResponseEntity<List<RouteDTO>> getAllRoutes(@Valid QueryDTO dto) {
+    public ResponseEntity<RoutesWithPagingDTO> getAllRoutes(@Valid QueryDTO dto) {
         return ResponseEntity.status(200).body(routeService.getAllRoutes(dto));
     }
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class PageService {
     private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_LIMIT = Integer.MAX_VALUE;
+    private static final int DEFAULT_LIMIT = 5;
 
     public PageRequest createPageRequest(Integer page, Integer elementsCount) {
         int resolvedPage = (page != null && page >= 0) ? page-1 : DEFAULT_PAGE;

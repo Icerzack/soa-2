@@ -3,8 +3,10 @@ package com.example.routes.service;
 import com.example.routes.converter.RouteConverter;
 import com.example.routes.dto.QueryDTO;
 import com.example.routes.dto.RouteDTO;
+import com.example.routes.dto.RoutesWithPagingDTO;
 import com.example.routes.entity.LocationEntity;
 import com.example.routes.entity.RouteEntity;
+import com.example.routes.entity.RoutesWithPagingEntity;
 import com.example.routes.exception.EntityNotFoundException;
 import com.example.routes.repository.LocationRepository;
 import com.example.routes.repository.RouteRepository;
@@ -168,15 +170,20 @@ public class RouteService {
         return checkLessThan(route, field, value) || checkEqual(route, field, value);
     }
 
-    public List<RouteEntity> getPaginatedRoutes(Integer page, Integer elementsCount) {
+    public RoutesWithPagingEntity getPaginatedRoutes(Integer page, Integer elementsCount) {
         Pageable pageable = pageService.createPageRequest(page, elementsCount);
-        return routeRepository.findByPageAndElementsCount(pageable);
+        RoutesWithPagingEntity routesWithPaging = new RoutesWithPagingEntity();
+        routesWithPaging.setRoutesEntity(routeRepository.findByPageAndElementsCount(pageable));
+        routesWithPaging.setPage(pageable.getPageNumber()+1);
+        routesWithPaging.setElementsCount(pageable.getPageSize());
+        return routesWithPaging;
     }
 
     @Transactional(readOnly = true)
-    public List<RouteDTO> getAllRoutes(@Valid QueryDTO dto) {
+    public RoutesWithPagingDTO getAllRoutes(@Valid QueryDTO dto) {
         FilterService.isValidRequestParams(dto);
-        List<RouteEntity> allRoutes = getPaginatedRoutes(dto.getPage(), dto.getElementsCount());
+        RoutesWithPagingEntity routesWithPagingEntity = getPaginatedRoutes(dto.getPage(), dto.getElementsCount());
+        List<RouteEntity> allRoutes = routesWithPagingEntity.getRoutesEntity();
         List<RouteEntity> allFilteredRoutes = filterRoutes(dto, allRoutes);
 
         Sort.Direction sortDirection = dto.getSortDirection() != null ? dto.getSortDirection() : Sort.Direction.ASC;
@@ -190,7 +197,12 @@ public class RouteService {
             allRoutesResponse.add(routeConverter.convertToDTO(routeEntity));
         }
 
-        return allRoutesResponse;
+        RoutesWithPagingDTO routesWithPagingDTO = new RoutesWithPagingDTO();
+        routesWithPagingDTO.setRoutesDTO(allRoutesResponse);
+        routesWithPagingDTO.setPage(routesWithPagingEntity.getPage());
+        routesWithPagingDTO.setElementsCount(routesWithPagingEntity.getElementsCount());
+
+        return routesWithPagingDTO;
     }
 
     @Transactional
