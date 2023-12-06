@@ -263,8 +263,7 @@ public class RouteService {
 
     @Transactional
     public void deleteRouteById(Long id) {
-        Optional<RouteEntity> entity = routeRepository.findRouteEntityById(id);
-        entity.ifPresent(routeEntity -> routeRepository.delete(routeEntity));
+        routeRepository.deleteRouteEntityById(id);
     }
 
     @Transactional
