@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class RouteService {
-    private static final double EPSILON = 0.001;
+    private static final double EPSILON = 1e-6;
     private static final Logger logger = LoggerFactory.getLogger(RouteService.class);
     @Autowired
     private RouteRepository routeRepository;
