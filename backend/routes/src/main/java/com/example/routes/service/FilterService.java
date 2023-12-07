@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.example.routes.service.SortService.getSortDirection;
@@ -58,8 +60,13 @@ public class FilterService {
         }
         if (dto.getSort() != null && !dto.getSort().isEmpty()) {
             try {
-                Sort.Direction sortDirection = getSortDirection(dto.getSort());
-                dto.setSortDirection(sortDirection);
+                List<String> sortFields = dto.getSort();
+                List<Sort.Direction> sortDirections = new ArrayList<>();
+                for (String sortField : sortFields) {
+                    Sort.Direction sortDirection = getSortDirection(sortField);
+                    sortDirections.add(sortDirection);
+                }
+                dto.setSortDirection(sortDirections);
             } catch (IllegalArgumentException e) {
                 throw new NotValidParamsException("Invalid sort field: " + dto.getSort());
             }

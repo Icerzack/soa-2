@@ -27,6 +27,18 @@ public class RouteConverter {
         return entity;
     }
 
+    public RouteEntity convertToEntityWithoutCreationDate(RouteDTO dto) {
+        RouteEntity entity = new RouteEntity();
+        entity
+                .setId(dto.getId())
+                .setName(dto.getName())
+                .setCreationDate(Timestamp.valueOf(dto.getCreationDate()))
+                .setLocationFrom(locationConverter.convertToEntity(dto.getFrom()))
+                .setLocationTo(locationConverter.convertToEntity(dto.getTo()))
+                .setDistance(dto.getDistance());
+        return entity;
+    }
+
     public RouteDTO convertToDTO(RouteEntity entity) {
         RouteDTO dto = new RouteDTO();
         dto

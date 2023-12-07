@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -25,65 +26,61 @@ public class SortService {
         }
     }
 
-    public static List<RouteEntity> sortElements(List<RouteEntity> allRoutes, String sortField, Sort.Direction sortDirection) {
-        Comparator<RouteEntity> comparator = getComparator(sortField, sortDirection);
+    public static List<RouteEntity> sortElements(List<RouteEntity> allRoutes, List<String> sortFields, List<Sort.Direction> sortDirections) {
+        Comparator<RouteEntity> comparator = getComparator(sortFields, sortDirections);
 
         return allRoutes.stream()
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
-    private static Comparator<RouteEntity> getComparator(String sortField, Sort.Direction sortDirection) {
-        sortField = sortField.startsWith("<") ? sortField.substring(1) : sortField;
+    private static Comparator<RouteEntity> getComparator(List<String> sortFields, List<Sort.Direction> sortDirections) {
+        List<Comparator<RouteEntity>> comparators = new ArrayList<>();
 
-        Comparator<RouteEntity> comparator;
-
-        switch (sortField) {
-            case "id":
-                comparator = Comparator.comparing(route -> route.getId());
-                break;
-            case "name":
-                comparator = Comparator.comparing(RouteEntity::getName);
-                break;
-            case "creationDate":
-                comparator = Comparator.comparing(RouteEntity::getCreationDate);
-                break;
-            case "locationFrom.id":
-                comparator = Comparator.comparing(route -> route.getLocationFrom().getId());
-                break;
-            case "locationFrom.coordinates.x":
-                comparator = Comparator.comparing(route -> route.getLocationFrom().getCoordinates().getX());
-                break;
-            case "locationFrom.coordinates.y":
-                comparator = Comparator.comparing(route -> route.getLocationFrom().getCoordinates().getY());
-                break;
-            case "locationFrom.name":
-                comparator = Comparator.comparing(route -> route.getLocationFrom().getName());
-                break;
-            case "locationTo.id":
-                comparator = Comparator.comparing(route -> route.getLocationTo().getId());
-                break;
-            case "locationTo.coordinates.x":
-                comparator = Comparator.comparing(route -> route.getLocationTo().getCoordinates().getX());
-                break;
-            case "locationTo.coordinates.y":
-                comparator = Comparator.comparing(route -> route.getLocationTo().getCoordinates().getY());
-                break;
-            case "locationTo.name":
-                comparator = Comparator.comparing(route -> route.getLocationTo().getName());
-                break;
-            case "distance":
-                comparator = Comparator.comparing(RouteEntity::getDistance);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid sort field: " + sortField);
+        for (int i = 0; i < sortFields.size(); i++) {
+            Comparator<RouteEntity> fieldComparator = getFieldComparator(sortFields.get(i));
+            comparators.add(sortDirections.get(i) == Sort.Direction.DESC ? fieldComparator.reversed() : fieldComparator);
         }
 
-        if (sortDirection == Sort.Direction.DESC) {
-            comparator = comparator.reversed();
+        Comparator<RouteEntity> comparator = comparators.get(0);
+
+        for (int i = 1; i < comparators.size(); i++) {
+            comparator = comparator.thenComparing(comparators.get(i));
         }
 
         return comparator;
     }
 
+    private static Comparator<RouteEntity> getFieldComparator(String sortField) {
+        sortField = sortField.startsWith("<") ? sortField.substring(1) : sortField;
+
+        switch (sortField) {
+            case "id":
+                return Comparator.comparing(RouteEntity::getId);
+            case "name":
+                return Comparator.comparing(RouteEntity::getName);
+            case "creationDate":
+                return Comparator.comparing(RouteEntity::getCreationDate);
+            case "locationFrom.id":
+                return Comparator.comparing(route -> route.getLocationFrom().getId());
+            case "locationFrom.coordinates.x":
+                return Comparator.comparing(route -> route.getLocationFrom().getCoordinates().getX());
+            case "locationFrom.coordinates.y":
+                return Comparator.comparing(route -> route.getLocationFrom().getCoordinates().getY());
+            case "locationFrom.name":
+                return Comparator.comparing(route -> route.getLocationFrom().getName());
+            case "locationTo.id":
+                return Comparator.comparing(route -> route.getLocationTo().getId());
+            case "locationTo.coordinates.x":
+                return Comparator.comparing(route -> route.getLocationTo().getCoordinates().getX());
+            case "locationTo.coordinates.y":
+                return Comparator.comparing(route -> route.getLocationTo().getCoordinates().getY());
+            case "locationTo.name":
+                return Comparator.comparing(route -> route.getLocationTo().getName());
+            case "distance":
+                return Comparator.comparing(RouteEntity::getDistance);
+            default:
+                throw new IllegalArgumentException("Invalid sort field: " + sortField);
+        }
+    }
 }

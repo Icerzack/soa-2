@@ -23,8 +23,8 @@ public class QueryDTO {
     private List<Float> locationToCoordinatesY = null;
     private List<String> locationToName = null;
     private List<Float> distance = null;
-    private Sort.Direction sortDirection;
-    private String sort;
+    private List<Sort.Direction> sortDirection;
+    private List<String> sort;
     private List<String> filter;
     private Integer page;
     private Integer elementsCount;

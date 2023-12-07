@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -49,7 +50,7 @@ public class RouteService {
 
         return routeDTOs.stream()
                 .filter(route -> checkConditions(route, query))
-                .map(routeConverter::convertToEntity)
+                .map(routeConverter::convertToEntityWithoutCreationDate)
                 .collect(Collectors.toList());
     }
 
@@ -186,11 +187,10 @@ public class RouteService {
         List<RouteEntity> allRoutes = routesWithPagingEntity.getRoutesEntity();
         List<RouteEntity> allFilteredRoutes = filterRoutes(dto, allRoutes);
 
-        Sort.Direction sortDirection = dto.getSortDirection() != null ? dto.getSortDirection() : Sort.Direction.ASC;
+        List<String> sortFields = dto.getSort() != null && !dto.getSort().isEmpty() ? dto.getSort() : Collections.emptyList();
+        List<Sort.Direction> sortDirections = dto.getSortDirection() != null ? dto.getSortDirection() : Collections.emptyList();
 
-        String sortField = dto.getSort() != null && !dto.getSort().isEmpty() ? dto.getSort() : "id";
-
-        List<RouteEntity> sortedRoutes = SortService.sortElements(allFilteredRoutes, sortField, sortDirection);
+        List<RouteEntity> sortedRoutes = SortService.sortElements(allFilteredRoutes, sortFields, sortDirections);
 
         List<RouteDTO> allRoutesResponse = new ArrayList<>();
         for (RouteEntity routeEntity : sortedRoutes) {
