@@ -341,8 +341,21 @@ public class RouteService {
     }
 
     private String buildQueryString(SpecialOfferQueryDTO dto) {
-        return "origin=" + dto.getOrigin() + "&destination=" + dto.getDestination()
-                + "&currency=" + dto.getCurrency() + "&locale=" + dto.getLocale();
+        String query = "";
+        if (dto.getOrigin() != null && !dto.getOrigin().equals("")) {
+            query+= "origin=" + dto.getOrigin() + "&";
+        }
+        if (dto.getDestination() != null && !dto.getDestination().equals("")) {
+            query+= "destination=" + dto.getDestination() + "&";
+        }
+        if (dto.getCurrency() != null && !dto.getCurrency().equals("")) {
+            query+= "currency=" + dto.getCurrency() + "&";
+        }
+        if (dto.getLocale() != null && !dto.getLocale().equals("")) {
+            query+= "locale=" + dto.getLocale();
+        }
+
+        return query;
     }
 
     @Transactional

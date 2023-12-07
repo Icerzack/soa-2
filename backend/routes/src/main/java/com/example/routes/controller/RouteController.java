@@ -73,7 +73,7 @@ public class RouteController {
 
     @GetMapping("/api/v1/routes/special-offer")
     @ApiOperation(value = "Вернуть выгодный билет для заданного маршрута")
-    public ResponseEntity<Map<String, Object>> getSpecialOffers(@Valid SpecialOfferQueryDTO dto) {
+    public ResponseEntity<Map<String, Object>> getSpecialOffers(SpecialOfferQueryDTO dto) {
         return ResponseEntity.status(200).body(routeService.getSpecialOffers(dto));
     }
 }
