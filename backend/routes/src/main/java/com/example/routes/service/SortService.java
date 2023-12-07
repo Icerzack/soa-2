@@ -46,7 +46,7 @@ public class SortService {
         }
 
         Comparator<RouteEntity> comparator = comparators.get(0);
-        for (int i = 0; i < comparators.size(); i++) {
+        for (int i = 1; i < comparators.size(); i++) {
             comparator = comparator.thenComparing(comparators.get(i));
         }
 
