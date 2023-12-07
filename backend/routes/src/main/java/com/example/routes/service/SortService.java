@@ -27,6 +27,9 @@ public class SortService {
     }
 
     public static List<RouteEntity> sortElements(List<RouteEntity> allRoutes, List<String> sortFields, List<Sort.Direction> sortDirections) {
+        if ((sortFields).size() == 0) {
+            return allRoutes;
+        }
         Comparator<RouteEntity> comparator = getComparator(sortFields, sortDirections);
 
         return allRoutes.stream()
@@ -43,8 +46,7 @@ public class SortService {
         }
 
         Comparator<RouteEntity> comparator = comparators.get(0);
-
-        for (int i = 1; i < comparators.size(); i++) {
+        for (int i = 0; i < comparators.size(); i++) {
             comparator = comparator.thenComparing(comparators.get(i));
         }
 

@@ -303,8 +303,9 @@ public class RouteService {
         Map<String, Object> responseMap = new HashMap<>();
 
         try {
-            String urlString = "http://localhost:8090/special_offers";
-            URL url = new URL(urlString + "?" + buildQueryString(dto));
+            Map<String, String> envs = System.getenv();
+            String aviasalesApiUrl = envs.get("AVIASALES_API_URL");
+            URL url = new URL(aviasalesApiUrl + "?" + buildQueryString(dto));
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
