@@ -3,6 +3,7 @@ package com.example.routes.controller;
 import com.example.routes.dto.QueryDTO;
 import com.example.routes.dto.RouteDTO;
 import com.example.routes.dto.RoutesWithPagingDTO;
+import com.example.routes.dto.SpecialOfferQueryDTO;
 import com.example.routes.service.RouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @Api(tags = "Route", description = "Эндпоинты для взаимодействия с route")
@@ -67,5 +69,11 @@ public class RouteController {
     @ApiOperation(value = "Вернуть количество объектов, значение поля distance которых больше заданного")
     public ResponseEntity<Integer> getCountRoutesWithGreaterDistance(@PathVariable("distance") float distance) {
         return ResponseEntity.status(200).body(routeService.getCountRoutesWithGreaterDistance(distance));
+    }
+
+    @GetMapping("/api/v1/routes/special-offer")
+    @ApiOperation(value = "Вернуть выгодный билет для заданного маршрута")
+    public ResponseEntity<Map<String, Object>> getSpecialOffers(@Valid SpecialOfferQueryDTO dto) {
+        return ResponseEntity.status(200).body(routeService.getSpecialOffers(dto));
     }
 }

@@ -4,6 +4,7 @@ import com.example.routes.converter.RouteConverter;
 import com.example.routes.dto.QueryDTO;
 import com.example.routes.dto.RouteDTO;
 import com.example.routes.dto.RoutesWithPagingDTO;
+import com.example.routes.dto.SpecialOfferQueryDTO;
 import com.example.routes.entity.LocationEntity;
 import com.example.routes.entity.RouteEntity;
 import com.example.routes.entity.RoutesWithPagingEntity;
@@ -18,13 +19,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class RouteService {
@@ -291,6 +296,52 @@ public class RouteService {
             }
         }
         return countRoutesWithGreaterDistance;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getSpecialOffers(SpecialOfferQueryDTO dto) {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            String urlString = "http://localhost:8090/special_offers";
+            URL url = new URL(urlString + "?" + buildQueryString(dto));
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                reader.close();
+
+                responseMap.put("responseCode", responseCode);
+                responseMap.put("responseData", response.toString());
+            } else {
+                responseMap.put("responseCode", responseCode);
+                responseMap.put("error", "Failed to get special offers");
+            }
+
+            connection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+            responseMap.put("error", "An exception occurred: " + e.getMessage());
+        }
+
+        return responseMap;
+    }
+
+    private String buildQueryString(SpecialOfferQueryDTO dto) {
+        return "origin=" + dto.getOrigin() + "&destination=" + dto.getDestination()
+                + "&currency=" + dto.getCurrency() + "&locale=" + dto.getLocale();
     }
 
     @Transactional
