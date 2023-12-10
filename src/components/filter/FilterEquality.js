@@ -1,11 +1,11 @@
-import set from "lodash.set";
-import { Form, InputGroup } from "react-bootstrap";
-import get from "lodash.get";
-import React from "react";
-import { useRecoilState } from "recoil";
-import { filtersState } from "../../state/atoms";
+import set from 'lodash.set';
+import { Form, InputGroup } from 'react-bootstrap';
+import get from 'lodash.get';
+import React from 'react';
+import { useRecoilState } from 'recoil';
+import { filtersState } from '../../state/atoms';
 
-export const FilterEquality = ({ filters, setFilters, id, type = "text" }) => {
+export const FilterEquality = ({ filters, setFilters, id, type = 'text' }) => {
   const [filtersGlobal, setFiltersGlobal] = useRecoilState(filtersState);
 
   const change = (event) => {
@@ -14,7 +14,7 @@ export const FilterEquality = ({ filters, setFilters, id, type = "text" }) => {
     setFilters(newFilters);
 
     const newFiltersGlobal = JSON.parse(JSON.stringify(filtersGlobal));
-    set(newFiltersGlobal, id, "");
+    set(newFiltersGlobal, id, '');
     setFiltersGlobal(newFiltersGlobal);
   };
 
@@ -24,8 +24,8 @@ export const FilterEquality = ({ filters, setFilters, id, type = "text" }) => {
       <Form.Control
         type={type}
         onChange={change}
-        className={get(filtersGlobal, id, "").length ? "bg-warning" : ""}
-        value={get(filters, id, "")}
+        className={get(filtersGlobal, id, '').length ? 'bg-warning' : ''}
+        value={get(filters, id, '')}
       />
     </InputGroup>
   );

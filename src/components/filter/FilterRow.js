@@ -1,21 +1,15 @@
-import { Form, InputGroup } from "react-bootstrap";
-import React from "react";
-import set from "lodash.set";
-import get from "lodash.get";
-import { useRecoilState } from "recoil";
-import { filtersState } from "../../state/atoms";
+import { Form, InputGroup } from 'react-bootstrap';
+import React from 'react';
+import set from 'lodash.set';
+import get from 'lodash.get';
+import { useRecoilState } from 'recoil';
+import { filtersState } from '../../state/atoms';
 
-export const FilterRow = ({
-  filters,
-  setFilters,
-  id,
-  type = "number",
-  step = "any",
-}) => {
+export const FilterRow = ({ filters, setFilters, id, type = 'number', step = 'any' }) => {
   const [filtersGlobal, setFiltersGlobal] = useRecoilState(filtersState);
   const change = (event) => {
     const newFilters = JSON.parse(JSON.stringify(filters));
-    set(newFilters, id + "." + event.target.id, event.target.value);
+    set(newFilters, id + '.' + event.target.id, event.target.value);
     setFilters(newFilters);
 
     const newFiltersGlobal = JSON.parse(JSON.stringify(filtersGlobal));
@@ -32,7 +26,7 @@ export const FilterRow = ({
         step={step}
         placeholder="="
         onChange={change}
-        value={get(filters, id + ".eq", "")}
+        value={get(filters, id + '.eq', '')}
       />
       <Form.Control
         id="neq"
@@ -40,7 +34,7 @@ export const FilterRow = ({
         step={step}
         placeholder="!="
         onChange={change}
-        value={get(filters, id + ".neq", "")}
+        value={get(filters, id + '.neq', '')}
       />
       <Form.Control
         id="gt"
@@ -48,7 +42,7 @@ export const FilterRow = ({
         step={step}
         placeholder=">"
         onChange={change}
-        value={get(filters, id + ".gt", "")}
+        value={get(filters, id + '.gt', '')}
       />
       <Form.Control
         id="lt"
@@ -56,7 +50,7 @@ export const FilterRow = ({
         step={step}
         placeholder="<"
         onChange={change}
-        value={get(filters, id + ".lt", "")}
+        value={get(filters, id + '.lt', '')}
       />
       <Form.Control
         id="get"
@@ -64,7 +58,7 @@ export const FilterRow = ({
         step={step}
         placeholder=">="
         onChange={change}
-        value={get(filters, id + ".get", "")}
+        value={get(filters, id + '.get', '')}
       />
       <Form.Control
         id="let"
@@ -72,7 +66,7 @@ export const FilterRow = ({
         step={step}
         placeholder="<="
         onChange={change}
-        value={get(filters, id + ".let", "")}
+        value={get(filters, id + '.let', '')}
       />
     </InputGroup>
   );

@@ -1,61 +1,61 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 
 export const isDataNeedsToBeUpdatedState = atom({
-  key: "isDataNeedsToBeUpdatedState",
-  default: true,
+  key: 'isDataNeedsToBeUpdatedState',
+  default: true
 });
 
 export const sortState = atom({
-  key: "sortState",
-  default: [],
+  key: 'sortState',
+  default: []
 });
 
 export const filtersState = atom({
-  key: "filtersState",
-  default: {},
+  key: 'filtersState',
+  default: {}
 });
 
 export const pagingState = atom({
-  key: "pagingState",
-  default: {},
+  key: 'pagingState',
+  default: {}
 });
 
 export const selectedRoutesId = atom({
-  key: "selectedRoutesId",
-  default: [],
+  key: 'selectedRoutesId',
+  default: []
 });
 
 export const feedbackRouteValidator = atom({
-  key: "feedbackRouteValidator",
-  default: {},
+  key: 'feedbackRouteValidator',
+  default: {}
 });
 
 export const wasValidated = atom({
-  key: "wasValidated",
-  default: false,
+  key: 'wasValidated',
+  default: false
 });
 
 export const isAddingWithLocationIds = atom({
-  key: "isAddingWithLocationIds",
-  default: false,
+  key: 'isAddingWithLocationIds',
+  default: false
 });
 
 export const isEditingRoute = atom({
-  key: "isEditingRoute",
-  default: false,
+  key: 'isEditingRoute',
+  default: false
 });
 
 export const bufferRoute = atom({
-  key: "bufferRoute",
-  default: {},
+  key: 'bufferRoute',
+  default: {}
 });
 
 export const showModalForm = atom({
-  key: "showModalForm",
-  default: false,
+  key: 'showModalForm',
+  default: false
 });
 
 export const routesState = atom({
-  key: "routesState",
-  default: [],
+  key: 'routesState',
+  default: []
 });

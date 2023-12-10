@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { RoutesTable } from "./components/RoutesTable";
-import { ModalWindow } from "./components/ModalWindow";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { DeleteRouteButton } from "./components/DeleteRouteButton";
-import { DijkstraForm } from "./components/navigator/DijkstraForm";
-import { FiltersForm } from "./components/table/FiltersForm";
-import { SortForm } from "./components/table/SortForm";
-import toast, { Toaster } from "react-hot-toast";
+import React, { useEffect, useState } from 'react';
+import { RoutesTable } from './components/RoutesTable';
+import { ModalWindow } from './components/ModalWindow';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { DeleteRouteButton } from './components/DeleteRouteButton';
+import { DijkstraForm } from './components/navigator/DijkstraForm';
+import { FiltersForm } from './components/table/FiltersForm';
+import { SortForm } from './components/table/SortForm';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   filtersState,
   isDataNeedsToBeUpdatedState,
   pagingState,
   routesState,
-  sortState,
-} from "./state/atoms";
-import { getRoutes } from "./utils/apiInteraction";
-import get from "lodash.get";
-import { ReloadButton } from "./components/ReloadButton";
-import { AddRoute } from "./components/navigator/AddRoute";
-import { DeleteAllRoutes } from "./components/routes/DeleteAllRoutes";
-import { CountAllRoutes } from "./components/routes/CountAllRoutes";
-import { CountDistanceGreater } from "./components/routes/CountDistanceGreater";
-import { PagingForm } from "./components/table/PagingForm";
+  sortState
+} from './state/atoms';
+import { getRoutes } from './utils/apiInteraction';
+import get from 'lodash.get';
+import { ReloadButton } from './components/ReloadButton';
+import { AddRoute } from './components/navigator/AddRoute';
+import { DeleteAllRoutes } from './components/routes/DeleteAllRoutes';
+import { CountAllRoutes } from './components/routes/CountAllRoutes';
+import { CountDistanceGreater } from './components/routes/CountDistanceGreater';
+import { PagingForm } from './components/table/PagingForm';
 
 function App() {
   const setRoutes = useSetRecoilState(routesState);
@@ -37,14 +37,13 @@ function App() {
     if (isDataNeedsToBeUpdated) {
       setIsLoading(true);
       setIsDataNeedsToBeUpdated(false);
-      console.log(filters);
       getRoutes(filters, sort, paging)
         .then((response) => {
           console.log(response.data);
           setRoutes(response.data);
         })
         .catch((err) => {
-          toast.error(get(err, "response.data.message", "Error loading data"));
+          toast.error(get(err, 'response.data.message', 'Error loading data'));
         })
         .finally(() => setIsLoading(false));
     }

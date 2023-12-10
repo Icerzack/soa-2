@@ -1,4 +1,4 @@
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import {
   bufferRoute,
   isAddingWithLocationIds,
@@ -8,18 +8,16 @@ import {
   routesState,
   selectedRoutesId,
   showModalForm,
-  wasValidated,
-} from "../state/atoms";
-import { fieldList } from "../utils/constants";
-import get from "lodash.get";
-import set from "lodash.set";
-import Button from "react-bootstrap/Button";
-import { ButtonGroup, ToggleButton } from "react-bootstrap";
+  wasValidated
+} from '../state/atoms';
+import { fieldList } from '../utils/constants';
+import get from 'lodash.get';
+import set from 'lodash.set';
+import Button from 'react-bootstrap/Button';
+import { ButtonGroup, ToggleButton } from 'react-bootstrap';
 
 export const RoutesTable = () => {
-  const setIsDataNeedsToBeUpdated = useSetRecoilState(
-    isDataNeedsToBeUpdatedState
-  );
+  const setIsDataNeedsToBeUpdated = useSetRecoilState(isDataNeedsToBeUpdatedState);
   const setShow = useSetRecoilState(showModalForm);
   const setIsEditing = useSetRecoilState(isEditingRoute);
   const setBufferRoute = useSetRecoilState(bufferRoute);
@@ -28,7 +26,7 @@ export const RoutesTable = () => {
   const [selectedIds, setSelectedId] = useRecoilState(selectedRoutesId);
   const [paging, setPaging] = useRecoilState(pagingState);
 
-  const [routes, setRoutes] = useRecoilState(routesState);
+  const [routes] = useRecoilState(routesState);
 
   const edit = (route) => {
     setBufferRoute(route);
@@ -48,7 +46,7 @@ export const RoutesTable = () => {
     } else {
       setSelectedId([...selectedIds, routeId]);
     }
-    console.log(selectedIds)
+    console.log(selectedIds);
   };
 
   return (
@@ -80,18 +78,15 @@ export const RoutesTable = () => {
               key={route.id}
               data-bs-toggle="tooltip"
               title={JSON.stringify(route, undefined, 4)}
-              className={selectedIds.indexOf(route.id) !== -1 ? "selected" : ""}
+              className={selectedIds.indexOf(route.id) !== -1 ? 'selected' : ''}
               onDoubleClick={() => {
                 edit(route);
               }}
               onClick={(event) => {
                 select(event, route.id);
-              }}
-            >
+              }}>
               {fieldList.map((field) => (
-                <td key={field}>
-                  {get(route, field.replaceAll("_", "."), "")}
-                </td>
+                <td key={field}>{get(route, field.replaceAll('_', '.'), '')}</td>
               ))}
             </tr>
           ))}
@@ -105,31 +100,25 @@ export const RoutesTable = () => {
               setPaging(
                 set(
                   Object.assign({}, paging),
-                  "pageNumber",
-                  Math.max(get(paging, "pageNumber", 1) - 1, 1)
+                  'pageNumber',
+                  Math.max(get(paging, 'pageNumber', 1) - 1, 1)
                 )
               );
               setIsDataNeedsToBeUpdated(true);
-            }}
-          >
+            }}>
             &lt;
           </Button>
           <ToggleButton variant="dark" value="page">
-            {get(paging, "pageNumber", 1)}
+            {get(paging, 'pageNumber', 1)}
           </ToggleButton>
           <Button
             variant="dark"
             onClick={() => {
               setPaging(
-                set(
-                  Object.assign({}, paging),
-                  "pageNumber",
-                  get(paging, "pageNumber", 1) + 1
-                )
+                set(Object.assign({}, paging), 'pageNumber', get(paging, 'pageNumber', 1) + 1)
               );
               setIsDataNeedsToBeUpdated(true);
-            }}
-          >
+            }}>
             &gt;
           </Button>
         </ButtonGroup>

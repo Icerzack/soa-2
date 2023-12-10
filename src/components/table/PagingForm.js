@@ -1,20 +1,28 @@
-import { Form, InputGroup } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import { useEffect, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import get from "lodash.get";
-import { isDataNeedsToBeUpdatedState, pagingState } from "../../state/atoms";
+import { Form } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import { useEffect, useState } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { isDataNeedsToBeUpdatedState, pagingState } from '../../state/atoms';
+import toast from 'react-hot-toast';
 
 export const PagingForm = () => {
-  const [paging, setPaging] = useRecoilState(pagingState);
-  const setIsDataNeedsToBeUpdated = useSetRecoilState(
-    isDataNeedsToBeUpdatedState
-  );
-  const [elementsCount, setElementsCount] = useState("");
-  const [pageNumber, setPageNumber] = useState("");
+  const [, setPaging] = useRecoilState(pagingState);
+  const setIsDataNeedsToBeUpdated = useSetRecoilState(isDataNeedsToBeUpdatedState);
+  const [elementsCount, setElementsCount] = useState('');
+  const [pageNumber, setPageNumber] = useState('');
   const [disable, setDisable] = useState(true);
 
   const click = () => {
+    if (pageNumber < 1 && pageNumber !== '') {
+      toast.error('Номер страницы всегда > 0!');
+      setPageNumber('1');
+      return;
+    }
+    if (elementsCount < 1 && elementsCount !== '') {
+      toast.error('Количество всегда > 0!');
+      setElementsCount('1');
+      return;
+    }
     const newPaging = {};
     if (elementsCount.length) newPaging.elementsCount = Number(elementsCount);
     if (pageNumber.length) newPaging.pageNumber = Number(pageNumber);
@@ -23,9 +31,7 @@ export const PagingForm = () => {
   };
 
   useEffect(() => {
-    (elementsCount === "" && pageNumber === "")
-      ? setDisable(true)
-      : setDisable(false);
+    elementsCount === '' && pageNumber === '' ? setDisable(true) : setDisable(false);
   }, [elementsCount, pageNumber]);
 
   return (
@@ -49,11 +55,7 @@ export const PagingForm = () => {
             setPageNumber(event.target.value);
           }}
         />
-        <Button
-          className="button-3 form"
-          onClick={click}
-          disabled={disable}
-        >
+        <Button className="button-3 form" onClick={click} disabled={disable}>
           Применить
         </Button>
       </div>

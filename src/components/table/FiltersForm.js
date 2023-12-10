@@ -1,17 +1,13 @@
-import { Form, Modal } from "react-bootstrap";
-import React, { useState } from "react";
-import Button from "react-bootstrap/Button";
-import { FilterBetween } from "../filter/FilterBetween";
-import { FilterEquality } from "../filter/FilterEquality";
-import { filtersState, isDataNeedsToBeUpdatedState } from "../../state/atoms";
-import { useSetRecoilState } from "recoil";
-import { FilterRow } from "../filter/FilterRow";
+import { Form, Modal } from 'react-bootstrap';
+import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import { filtersState, isDataNeedsToBeUpdatedState } from '../../state/atoms';
+import { useSetRecoilState } from 'recoil';
+import { FilterRow } from '../filter/FilterRow';
 
 export const FiltersForm = () => {
   const setFiltersGlobal = useSetRecoilState(filtersState);
-  const setIsDataNeedsToBeUpdated = useSetRecoilState(
-    isDataNeedsToBeUpdatedState
-  );
+  const setIsDataNeedsToBeUpdated = useSetRecoilState(isDataNeedsToBeUpdatedState);
   const [filters, setFilters] = useState({});
   const [show, setShow] = useState(false);
 
@@ -25,8 +21,7 @@ export const FiltersForm = () => {
         id="filtersForm"
         show={show}
         onHide={() => setShow(false)}
-        fullscreen={true}
-      >
+        fullscreen={true}>
         <Modal.Header closeButton closeVariant="black">
           <Modal.Title>Назначить фильтры</Modal.Title>
         </Modal.Header>
@@ -52,8 +47,7 @@ export const FiltersForm = () => {
             onClick={() => {
               setFilters({});
               setFiltersGlobal({});
-            }}
-          >
+            }}>
             Очистить
           </Button>
           <Button
@@ -61,8 +55,7 @@ export const FiltersForm = () => {
             onClick={() => {
               setFiltersGlobal(filters);
               setIsDataNeedsToBeUpdated(true);
-            }}
-          >
+            }}>
             Применить фильтры
           </Button>
         </Modal.Footer>
