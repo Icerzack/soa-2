@@ -28,7 +28,8 @@ export const InputField = ({ id, isEmbedded = false, type = 'number', step = 'an
       <InputGroup.Text id={id}>{id.split('.').pop()}</InputGroup.Text>
       <OverlayTrigger
         placement="bottom"
-        overlay={<Tooltip id={'tooltip' + id}>{validated ? get(feedback, id, '') : ''}</Tooltip>}>
+        overlay={<Tooltip id={'tooltip' + id}>{validated ? get(feedback, id, '') : ''}</Tooltip>}
+      >
         <Form.Control
           id={id}
           value={get(route, id, '')}
@@ -43,7 +44,8 @@ export const InputField = ({ id, isEmbedded = false, type = 'number', step = 'an
   ) : (
     <OverlayTrigger
       placement="bottom"
-      overlay={<Tooltip id={'tooltip' + id}>{validated ? get(feedback, id, '') : ''}</Tooltip>}>
+      overlay={<Tooltip id={'tooltip' + id}>{validated ? get(feedback, id, '') : ''}</Tooltip>}
+    >
       <Form.Group className="mb-3">
         <Form.Label htmlFor={id}>{id.firstLetterToUppercase()}</Form.Label>
         <Form.Control

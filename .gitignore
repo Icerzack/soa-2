@@ -25,6 +25,3 @@ replay_pid*
 
 # node
 node_modules
-package.json
-package-lock.json
-*.lock
