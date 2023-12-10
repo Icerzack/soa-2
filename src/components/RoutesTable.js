@@ -84,8 +84,7 @@ export const RoutesTable = () => {
               }}
               onClick={(event) => {
                 select(event, route.id);
-              }}
-            >
+              }}>
               {fieldList.map((field) => (
                 <td key={field}>{get(route, field.replaceAll('_', '.'), '')}</td>
               ))}
@@ -106,8 +105,7 @@ export const RoutesTable = () => {
                 )
               );
               setIsDataNeedsToBeUpdated(true);
-            }}
-          >
+            }}>
             &lt;
           </Button>
           <ToggleButton variant="dark" value="page">
@@ -120,8 +118,7 @@ export const RoutesTable = () => {
                 set(Object.assign({}, paging), 'pageNumber', get(paging, 'pageNumber', 1) + 1)
               );
               setIsDataNeedsToBeUpdated(true);
-            }}
-          >
+            }}>
             &gt;
           </Button>
         </ButtonGroup>

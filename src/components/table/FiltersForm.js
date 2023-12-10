@@ -21,8 +21,7 @@ export const FiltersForm = () => {
         id="filtersForm"
         show={show}
         onHide={() => setShow(false)}
-        fullscreen={true}
-      >
+        fullscreen={true}>
         <Modal.Header closeButton closeVariant="black">
           <Modal.Title>Назначить фильтры</Modal.Title>
         </Modal.Header>
@@ -48,8 +47,7 @@ export const FiltersForm = () => {
             onClick={() => {
               setFilters({});
               setFiltersGlobal({});
-            }}
-          >
+            }}>
             Очистить
           </Button>
           <Button
@@ -57,8 +55,7 @@ export const FiltersForm = () => {
             onClick={() => {
               setFiltersGlobal(filters);
               setIsDataNeedsToBeUpdated(true);
-            }}
-          >
+            }}>
             Применить фильтры
           </Button>
         </Modal.Footer>

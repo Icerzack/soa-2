@@ -78,8 +78,7 @@ export const ModalWindow = () => {
         show={show}
         onHide={() => setShow(false)}
         contentClassName="bg-white text-dark"
-        fullscreen={true}
-      >
+        fullscreen={true}>
         <Modal.Header closeButton closeVariant="dark">
           <Modal.Title>Окно Route {isEditing ? 'для id: ' + route.id : ''}</Modal.Title>
         </Modal.Header>
@@ -92,8 +91,7 @@ export const ModalWindow = () => {
           </Button>
           <Button
             variant="outline-secondary text-dark"
-            onClick={isEditing ? updateRoute : addRoute}
-          >
+            onClick={isEditing ? updateRoute : addRoute}>
             {isEditing ? 'Обновить Route' : 'Добавить Route'}
           </Button>
         </Modal.Footer>

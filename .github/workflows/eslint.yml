@@ -1,4 +1,4 @@
-name: ESLint & Prettier
+name: ESLint
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    name: Run eslint & prettier
+    name: Run eslint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -18,7 +18,5 @@ jobs:
         uses: actions/checkout@v3
       - name: Install packages
         run: npm install
-      - name: Prettier
-        run: npm run format
       - name: Lint
-        run: npm run lint:fix
+        run: npm run lint
