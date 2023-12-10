@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { addRouteS2 } from '../../utils/apiInteraction';
 import toast from 'react-hot-toast';
 import get from 'lodash.get';
-import { useRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { isDataNeedsToBeUpdatedState } from '../../state/atoms';
 
 export const AddRoute = () => {
   const [fromId, setFromId] = useState('');
   const [toId, setToId] = useState('');
-  const [setIsDataNeedsToBeUpdated] = useRecoilState(isDataNeedsToBeUpdatedState);
+  const setIsDataNeedsToBeUpdated = useSetRecoilState(isDataNeedsToBeUpdatedState);
 
   const addNewRoute = () => {
     toast
