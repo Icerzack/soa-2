@@ -14,7 +14,6 @@ import javax.validation.constraints.NotNull;
 public class RouteDTO {
     private Long id;
     @NotNull
-    @JsonIgnore
     private String creationDate;
     @NotNull
     @NotBlank(message = "The name should not be empty")
