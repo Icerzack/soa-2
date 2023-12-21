@@ -9,7 +9,6 @@ import javax.ws.rs.ApplicationPath;
 @SpringBootApplication
 @EnableFeignClients
 public class SoaSecondApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(SoaSecondApplication.class, args);
     }

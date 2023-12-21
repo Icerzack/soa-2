@@ -38,7 +38,7 @@ public class NavigatorService {
 
     public ResponseEntity<RouteDTO> addRoute(Long idFrom, Long idTo) {
         RouteDTO newRoute = new RouteDTO();
-        newRoute.setName("Дорога "+idFrom+"-"+idTo);
+        newRoute.setName("Дорога от "+idFrom+" в "+idTo);
         newRoute.setFrom(new LocationDTO()
                 .setName("Локация_№"+idFrom)
                 .setId(idFrom)

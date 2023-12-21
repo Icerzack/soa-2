@@ -1,12 +1,16 @@
 package com.example.routes.handler;
 
 import com.example.routes.controller.RouteController;
+import com.example.routes.exception.ResourceNotFoundException;
+import com.example.routes.service.RouteService;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.example.routes.dto.ErrorDefaultDTO;
 import com.example.routes.exception.EntityNotFoundException;
 import com.example.routes.exception.NotValidParamsException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -14,68 +18,113 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+import java.lang.reflect.InvocationTargetException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.stream.Collectors;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice(assignableTypes = {RouteController.class})
+@ControllerAdvice(assignableTypes = {RouteController.class, RouteService.class})
 public class ProcessExceptionHandler {
-    private final ErrorDefaultDTO ErrorDefaultDTO = new ErrorDefaultDTO();
-
-    @ExceptionHandler({Exception.class})
-    public ResponseEntity<?> handleException(Exception e) {
-        return ResponseEntity.status(400)
-                .body(ErrorDefaultDTO.setMessage("Произошла ошибка: " + e));
-    }
 
     @ExceptionHandler({InvalidFormatException.class})
-    public ResponseEntity<?> handleInvalidFormatException(InvalidFormatException e) {
-        return ResponseEntity.status(400)
-                .body(ErrorDefaultDTO.setMessage("Произошла ошибка: " + e.getMessage()));
+    public ResponseEntity<?> handleInvalidFormatException(Exception e) {
+        System.out.println(e.getMessage());
+        int code = 400;
+        String message = "Невалидный формат";
+        ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+        String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        ErrorDefaultDTO errorDTO = new ErrorDefaultDTO();
+        errorDTO.setCode(code);
+        errorDTO.setMessage(message);
+        errorDTO.setTime(formattedCurrentDateTime);
+        return ResponseEntity.status(code).body(errorDTO);
     }
 
     @ExceptionHandler({EntityNotFoundException.class})
     public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e) {
-        return ResponseEntity.status(404)
-                .body(ErrorDefaultDTO.setMessage("Произошла ошибка: " + e.getMessage()));
-    }
-
-    @ExceptionHandler({NotValidParamsException.class})
-    public ResponseEntity<?> handleNotValidParamsException(NotValidParamsException e) {
-        return ResponseEntity.status(422)
-                .body(ErrorDefaultDTO.setMessage("Произошла ошибка: " + e.getMessage()));
+        System.out.println(e.getMessage());
+        int code = 404;
+        String message = "Сущность не найдена";
+        ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+        String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        ErrorDefaultDTO errorDTO = new ErrorDefaultDTO();
+        errorDTO.setCode(code);
+        errorDTO.setMessage(message);
+        errorDTO.setTime(formattedCurrentDateTime);
+        return ResponseEntity.status(code).body(errorDTO);
     }
 
     @ExceptionHandler({DateTimeParseException.class})
     public ResponseEntity<?> handleDateTimeParseException(DateTimeParseException e) {
-        return ResponseEntity.status(422)
-                .body(ErrorDefaultDTO.setMessage("Произошла ошибка: " + e.getMessage()));
+        System.out.println(e.getMessage());
+        int code = 422;
+        String message = "Ошибка с парсингом даты, " + e.getMessage();
+        ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+        String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        ErrorDefaultDTO errorDTO = new ErrorDefaultDTO();
+        errorDTO.setCode(code);
+        errorDTO.setMessage(message);
+        errorDTO.setTime(formattedCurrentDateTime);
+        return ResponseEntity.status(code).body(errorDTO);
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
-    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return ResponseEntity.status(422)
-                .body(ErrorDefaultDTO.setMessage("Невалидные формат json"));
+    public ResponseEntity<?> handleHttpMessageNotReadableException(Exception e) {
+        System.out.println(e.getMessage());
+        int code = 422;
+        String message = "Невалидный формат json";
+        ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+        String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        ErrorDefaultDTO errorDTO = new ErrorDefaultDTO();
+        errorDTO.setCode(code);
+        errorDTO.setMessage(message);
+        errorDTO.setTime(formattedCurrentDateTime);
+        return ResponseEntity.status(code).body(errorDTO);
     }
 
 
-    @ExceptionHandler({ConstraintViolationException.class, BindException.class, MethodArgumentNotValidException.class,
-            MissingServletRequestParameterException.class, IllegalArgumentException.class})
-    public ResponseEntity<?> handleValidationException(Exception ex) {
-        String message = ex.getMessage();
-        if (ex instanceof MethodArgumentNotValidException) {
-            message = "Некорректные параметры " + getValidationError((MethodArgumentNotValidException) ex);
-        }
-        return ResponseEntity.badRequest()
-                .body(ErrorDefaultDTO.setMessage(message));
+    @ExceptionHandler({ConstraintViolationException.class,
+            BindException.class,
+            MethodArgumentNotValidException.class,
+            InvocationTargetException.class,
+            MissingServletRequestParameterException.class,
+            IllegalArgumentException.class,
+            NotValidParamsException.class,
+            NumberFormatException.class,
+            ValidationException.class,
+            MethodArgumentTypeMismatchException.class,
+    })
+    public ResponseEntity<?> handleValidationException(Exception e) {
+        System.out.println(e.getMessage() + " " + e.getClass().getCanonicalName());
+        int code = HttpStatus.BAD_REQUEST.value();
+        String message = "Некорректные входные параметры: " + e.getMessage();
+        ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+        String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        ErrorDefaultDTO errorDTO = new ErrorDefaultDTO();
+        errorDTO.setCode(code);
+        errorDTO.setMessage(message);
+        errorDTO.setTime(formattedCurrentDateTime);
+        return ResponseEntity.badRequest().body(errorDTO);
     }
 
-    private String getValidationError(MethodArgumentNotValidException ex) {
-        return ex.getBindingResult().getFieldErrors().stream()
-                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-                .sorted()
-                .collect(Collectors.joining(";"));
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorDefaultDTO> handleNoHandlerFoundException(ResourceNotFoundException e) {
+        System.out.println(e.getMessage() + " " + e.getClass().getCanonicalName());
+        int code = HttpStatus.BAD_REQUEST.value();
+        String message = "Несуществующий URI";
+        ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+        String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        ErrorDefaultDTO errorDTO = new ErrorDefaultDTO();
+        errorDTO.setCode(code);
+        errorDTO.setMessage(message);
+        errorDTO.setTime(formattedCurrentDateTime);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(errorDTO);
     }
 }

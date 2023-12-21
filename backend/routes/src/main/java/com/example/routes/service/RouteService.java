@@ -9,6 +9,7 @@ import com.example.routes.entity.LocationEntity;
 import com.example.routes.entity.RouteEntity;
 import com.example.routes.entity.RoutesWithPagingEntity;
 import com.example.routes.exception.EntityNotFoundException;
+import com.example.routes.exception.NotValidParamsException;
 import com.example.routes.repository.LocationRepository;
 import com.example.routes.repository.RouteRepository;
 import org.slf4j.Logger;
@@ -18,7 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -32,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Validated
 public class RouteService {
     private static final double EPSILON = 1e-6;
     private static final Logger logger = LoggerFactory.getLogger(RouteService.class);
@@ -211,7 +216,8 @@ public class RouteService {
     }
 
     @Transactional
-    public RouteDTO addNewRoute(RouteDTO dto) {
+    @Validated
+    public RouteDTO addNewRoute(@Valid RouteDTO dto) {
         RouteEntity entity = routeConverter.convertToEntity(dto);
         LocationEntity newLocationFromEntity = entity.getLocationFrom();
         LocationEntity newLocationToEntity = entity.getLocationTo();
@@ -233,6 +239,9 @@ public class RouteService {
 
     @Transactional(readOnly = true)
     public RouteDTO getRouteById(Long id) {
+        if (id < 1) {
+            throw new NotValidParamsException("id must me positive");
+        }
         Optional<RouteEntity> entity = routeRepository.findRouteEntityById(id);
         if (entity.isPresent()) {
             return routeConverter.convertToDTO(entity.get());
@@ -242,7 +251,10 @@ public class RouteService {
     }
 
     @Transactional
-    public RouteDTO updateRouteById(Long id, RouteDTO dto) {
+    public RouteDTO updateRouteById(Long id, @Valid RouteDTO dto) {
+        if (id < 1) {
+            throw new NotValidParamsException("id must me positive");
+        }
         Optional<RouteEntity> entity = routeRepository.findRouteEntityById(id);
         if (entity.isPresent()) {
             RouteEntity newEntity = routeConverter.convertToEntity(dto);
@@ -268,11 +280,17 @@ public class RouteService {
 
     @Transactional
     public void deleteRouteById(Long id) {
+        if (id < 1) {
+            throw new NotValidParamsException("id must me positive");
+        }
         routeRepository.deleteRouteEntityById(id);
     }
 
     @Transactional
     public void deleteRoutesByDistance(float distance) {
+        if (distance < 0) {
+            throw new NotValidParamsException("distance mustn't be negative");
+        }
         routeRepository.deleteRoutesByDistance(distance);
     }
 
@@ -288,6 +306,9 @@ public class RouteService {
 
     @Transactional(readOnly = true)
     public int getCountRoutesWithGreaterDistance(float distance) {
+        if (distance < 0) {
+            throw new NotValidParamsException("distance mustn't be negative");
+        }
         List<RouteEntity> allRoutes = routeRepository.findAllRoutesEntity();
         int countRoutesWithGreaterDistance = 0;
         for (RouteEntity routeEntity: allRoutes) {
@@ -299,7 +320,7 @@ public class RouteService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getSpecialOffers(SpecialOfferQueryDTO dto) {
+    public Map<String, Object> getSpecialOffers(@Valid SpecialOfferQueryDTO dto) {
         Map<String, Object> responseMap = new HashMap<>();
 
         try {
