@@ -39,6 +39,7 @@ public class NavigatorService {
 
             return Dijkstra.shortestPath(graph, Math.toIntExact(idFrom), Math.toIntExact(idTo));
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return -1f;
         }
     }
