@@ -70,7 +70,7 @@ public class NavigatorController {
         } catch (FirstServiceUnavailableException e) {
             System.out.println(e.getClass().getCanonicalName());
             ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
-            errorDefaultDTO.setCode(404);
+            errorDefaultDTO.setCode(500);
             errorDefaultDTO.setMessage("проверьте работоспособность первого сервиса");
             ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
             String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
@@ -79,7 +79,7 @@ public class NavigatorController {
         } catch (Exception e) {
             System.out.println(e.getClass().getCanonicalName());
             ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
-            errorDefaultDTO.setCode(404);
+            errorDefaultDTO.setCode(500);
             errorDefaultDTO.setMessage("Непредвиденная ошибка");
             ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
             String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
@@ -129,7 +129,7 @@ public class NavigatorController {
         } catch (FirstServiceUnavailableException e) {
             System.out.println(e.getClass().getCanonicalName());
             ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
-            errorDefaultDTO.setCode(404);
+            errorDefaultDTO.setCode(500);
             errorDefaultDTO.setMessage("проверьте работоспособность первого сервиса");
             ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
             String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
@@ -138,7 +138,7 @@ public class NavigatorController {
         } catch (Exception e) {
             System.out.println(e.getClass().getCanonicalName());
             ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
-            errorDefaultDTO.setCode(404);
+            errorDefaultDTO.setCode(500);
             errorDefaultDTO.setMessage("Непредвиденная ошибка");
             ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
             String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
