@@ -44,7 +44,7 @@ public class NavigatorController {
             if (distance == -1f){
                 throw new FirstServiceUnavailableException("Недоступен первый сервис: ");
             }
-            return Response.ok().build();
+            return Response.ok(distance).build();
         } catch (FeignException e) {
             return e.status() == -1 ? Response.status(Response.Status.GATEWAY_TIMEOUT.getStatusCode())
                     .entity("Service unavailable")
