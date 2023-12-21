@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class NavigatorService {
+    @Inject
     private RouteClient routeClient;
 
     public Float findShortest(Long idFrom, Long idTo) {
@@ -36,24 +39,36 @@ public class NavigatorService {
         return Dijkstra.shortestPath(graph, Math.toIntExact(idFrom), Math.toIntExact(idTo));
     }
 
-    public ResponseEntity<RouteDTO> addRoute(Long idFrom, Long idTo) {
+    public RouteDTO addRoute(Long idFrom, Long idTo) {
+        GetRoutesResponseDTO r = routeClient.getRoutes();
+        List<RouteDTO> routes = r.getRoutes();
+        LocationDTO locationFrom = null;
+        LocationDTO locationTo = null;
+        for (RouteDTO routeDTO : routes) {
+            if (locationFrom != null && locationTo != null) {
+                break;
+            }
+            if (routeDTO.getFrom().getId() == idFrom) {
+                locationFrom = routeDTO.getFrom();
+            }
+            if (routeDTO.getTo().getId() == idTo) {
+                locationTo = routeDTO.getTo();
+            }
+        }
         RouteDTO newRoute = new RouteDTO();
-        newRoute.setName("Дорога от "+idFrom+" в "+idTo);
-        newRoute.setFrom(new LocationDTO()
-                .setName("Локация_№"+idFrom)
-                .setId(idFrom)
-                .setCoordinates(new CoordinateDTO()
-                        .setX(1)
-                        .setY(1))
-        );
-        newRoute.setTo(new LocationDTO()
-                .setName("Локация_№"+idTo)
-                .setId(idTo)
-                .setCoordinates(new CoordinateDTO()
-                        .setX(2)
-                        .setY(2))
-        );
-        newRoute.setDistance((float) (Math.random() * 100));
-        return routeClient.addRoute(newRoute);
+        newRoute.setName("Route from " + locationFrom.getName() + " to " + locationTo.getName());
+        newRoute.setFrom(locationFrom);
+        newRoute.setTo(locationTo);
+        newRoute.setDistance((float) calculateDistance(
+                locationFrom.getCoordinates().getX(),
+                locationFrom.getCoordinates().getY(),
+                locationTo.getCoordinates().getX(),
+                locationTo.getCoordinates().getY()));
+        RouteDTO dto = routeClient.addRoute(newRoute);
+        return dto;
+    }
+
+    public static double calculateDistance(int x1, Float y1, int x2, Float y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 }

@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.ws.rs.core.Response;
+import java.util.List;
+
 public interface RouteClient {
     @RequestMapping(
             value = "/routes?elementsCount=999999",
@@ -21,5 +24,5 @@ public interface RouteClient {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    ResponseEntity<RouteDTO> addRoute(RouteDTO route);
+    RouteDTO addRoute(RouteDTO route);
 }
