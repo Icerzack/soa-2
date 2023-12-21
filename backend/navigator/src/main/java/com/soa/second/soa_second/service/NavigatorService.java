@@ -22,50 +22,57 @@ public class NavigatorService {
     private RouteClient routeClient;
 
     public Float findShortest(Long idFrom, Long idTo) {
-        GetRoutesResponseDTO r = routeClient.getRoutes();
-        List<RouteDTO> routes = r.getRoutes();
-        int numNodes = routes.size();
-        List<List<Dijkstra.Edge>> graph = new ArrayList<>();
-        for (int i = 0; i < numNodes; i++) {
-            graph.add(new ArrayList<>());
-        }
+        try {
+            GetRoutesResponseDTO r = routeClient.getRoutes();
+            List<RouteDTO> routes = r.getRoutes();
+            int numNodes = routes.size();
+            List<List<Dijkstra.Edge>> graph = new ArrayList<>();
+            for (int i = 0; i < numNodes; i++) {
+                graph.add(new ArrayList<>());
+            }
 
-        for (RouteDTO rd : routes) {
-            graph
-                    .get(Math.toIntExact(rd.getFrom().getId()))
-                    .add(new Dijkstra.Edge(rd.getTo().getId(), rd.getDistance()));
-        }
+            for (RouteDTO rd : routes) {
+                graph
+                        .get(Math.toIntExact(rd.getFrom().getId()))
+                        .add(new Dijkstra.Edge(rd.getTo().getId(), rd.getDistance()));
+            }
 
-        return Dijkstra.shortestPath(graph, Math.toIntExact(idFrom), Math.toIntExact(idTo));
+            return Dijkstra.shortestPath(graph, Math.toIntExact(idFrom), Math.toIntExact(idTo));
+        } catch (Exception e) {
+            return -1f;
+        }
     }
 
     public RouteDTO addRoute(Long idFrom, Long idTo) {
-        GetRoutesResponseDTO r = routeClient.getRoutes();
-        List<RouteDTO> routes = r.getRoutes();
-        LocationDTO locationFrom = null;
-        LocationDTO locationTo = null;
-        for (RouteDTO routeDTO : routes) {
-            if (locationFrom != null && locationTo != null) {
-                break;
+        try {
+            GetRoutesResponseDTO r = routeClient.getRoutes();
+            List<RouteDTO> routes = r.getRoutes();
+            LocationDTO locationFrom = null;
+            LocationDTO locationTo = null;
+            for (RouteDTO routeDTO : routes) {
+                if (locationFrom != null && locationTo != null) {
+                    break;
+                }
+                if (routeDTO.getFrom().getId() == idFrom) {
+                    locationFrom = routeDTO.getFrom();
+                }
+                if (routeDTO.getTo().getId() == idTo) {
+                    locationTo = routeDTO.getTo();
+                }
             }
-            if (routeDTO.getFrom().getId() == idFrom) {
-                locationFrom = routeDTO.getFrom();
-            }
-            if (routeDTO.getTo().getId() == idTo) {
-                locationTo = routeDTO.getTo();
-            }
+            RouteDTO newRoute = new RouteDTO();
+            newRoute.setName("Route from " + locationFrom.getName() + " to " + locationTo.getName());
+            newRoute.setFrom(locationFrom);
+            newRoute.setTo(locationTo);
+            newRoute.setDistance((float) calculateDistance(
+                    locationFrom.getCoordinates().getX(),
+                    locationFrom.getCoordinates().getY(),
+                    locationTo.getCoordinates().getX(),
+                    locationTo.getCoordinates().getY()));
+            return routeClient.addRoute(newRoute);
+        } catch (Exception e) {
+            return null;
         }
-        RouteDTO newRoute = new RouteDTO();
-        newRoute.setName("Route from " + locationFrom.getName() + " to " + locationTo.getName());
-        newRoute.setFrom(locationFrom);
-        newRoute.setTo(locationTo);
-        newRoute.setDistance((float) calculateDistance(
-                locationFrom.getCoordinates().getX(),
-                locationFrom.getCoordinates().getY(),
-                locationTo.getCoordinates().getX(),
-                locationTo.getCoordinates().getY()));
-        RouteDTO dto = routeClient.addRoute(newRoute);
-        return dto;
     }
 
     public static double calculateDistance(int x1, Float y1, int x2, Float y2) {

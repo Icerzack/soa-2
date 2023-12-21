@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soa.second.soa_second.dto.ErrorDefaultDTO;
 import com.soa.second.soa_second.dto.RouteDTO;
+import com.soa.second.soa_second.exception.FirstServiceUnavailableException;
 import com.soa.second.soa_second.exception.NotValidParamsException;
 import com.soa.second.soa_second.service.NavigatorService;
 import feign.FeignException;
@@ -39,7 +40,11 @@ public class NavigatorController {
             if (parsedIdFrom < 1 || parsedIdTo < 1) {
                 throw new NotValidParamsException("невалидные входные данные: ");
             }
-            return Response.ok(navigatorService.findShortest(parsedIdFrom, parsedIdTo)).build();
+            float distance = navigatorService.findShortest(parsedIdFrom, parsedIdTo);
+            if (distance == -1f){
+                throw new FirstServiceUnavailableException("Недоступен первый сервис: ");
+            }
+            return Response.ok().build();
         } catch (FeignException e) {
             return e.status() == -1 ? Response.status(Response.Status.GATEWAY_TIMEOUT.getStatusCode())
                     .entity("Service unavailable")
@@ -58,6 +63,15 @@ public class NavigatorController {
             ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
             errorDefaultDTO.setCode(404);
             errorDefaultDTO.setMessage("id must be positive");
+            ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+            String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+            errorDefaultDTO.setTime(formattedCurrentDateTime);
+            return Response.status(errorDefaultDTO.getCode()).entity(errorDefaultDTO).build();
+        } catch (FirstServiceUnavailableException e) {
+            System.out.println(e.getClass().getCanonicalName());
+            ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
+            errorDefaultDTO.setCode(404);
+            errorDefaultDTO.setMessage("проверьте работоспособность первого сервиса");
             ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
             String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
             errorDefaultDTO.setTime(formattedCurrentDateTime);
@@ -85,7 +99,11 @@ public class NavigatorController {
             if (parsedIdFrom < 1 || parsedIdTo < 1) {
                 throw new NotValidParamsException("невалидные входные данные: ");
             }
-            return Response.ok(navigatorService.addRoute(parsedIdFrom, parsedIdTo)).build();
+            RouteDTO dto = navigatorService.addRoute(parsedIdFrom, parsedIdTo);
+            if (dto == null) {
+                throw new FirstServiceUnavailableException("Недоступен первый сервис: ");
+            }
+            return Response.ok().build();
         } catch (FeignException e) {
             return e.status() == -1 ? Response.status(Response.Status.GATEWAY_TIMEOUT.getStatusCode())
                     .entity("Service unavailable")
@@ -104,6 +122,15 @@ public class NavigatorController {
             ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
             errorDefaultDTO.setCode(404);
             errorDefaultDTO.setMessage("id must be positive");
+            ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
+            String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
+            errorDefaultDTO.setTime(formattedCurrentDateTime);
+            return Response.status(errorDefaultDTO.getCode()).entity(errorDefaultDTO).build();
+        } catch (FirstServiceUnavailableException e) {
+            System.out.println(e.getClass().getCanonicalName());
+            ErrorDefaultDTO errorDefaultDTO = new ErrorDefaultDTO();
+            errorDefaultDTO.setCode(404);
+            errorDefaultDTO.setMessage("проверьте работоспособность первого сервиса");
             ZonedDateTime currentDateTime = ZonedDateTime.now(java.time.ZoneId.of("UTC+3"));
             String formattedCurrentDateTime = currentDateTime.format(DateTimeFormatter.ISO_DATE_TIME);
             errorDefaultDTO.setTime(formattedCurrentDateTime);
